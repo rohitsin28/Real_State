@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 import { app } from '../firebase';
-import {updateUserStart,updateUserFailure,updateUserSuccess, deleteUserFailed, deleteUserSuccess, deleteUserStart} from '../redux/user/userSlice.js'
+import {updateUserStart,updateUserFailure,updateUserSuccess, deleteUserFailed, deleteUserSuccess, deleteUserStart, signOutUserFailed, signOutUserStart, signOutUserSuccess} from '../redux/user/userSlice.js'
 import { useDispatch } from 'react-redux';
 
 
@@ -62,7 +62,7 @@ const Profile = () => {
       });
       const data = await res.json();
       if(data.success === false){
-        dispatch(updateUserFailure(error.message));
+        dispatch(updateUserFailure(data.message));
         return
       }
       dispatch(updateUserSuccess(data))
@@ -79,11 +79,27 @@ const Profile = () => {
       });
       const data = await res.json();
       if(data.success === false ){
-        dispatch(deleteUserFailed(error.message))
+        dispatch(deleteUserFailed(data.message))
+        return
       }
       dispatch(deleteUserSuccess(data))
     } catch (error) {
-      dispatch(deleteUserFailed(data))
+      dispatch(deleteUserFailed(data.message))
+    }
+  }
+
+  const handleSignOut = async() => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch('/api/user/signout')
+      const data = res.json();
+      if(data.success===false){
+        dispatch(signOutUserFailed(data.message))
+        return
+      }
+      dispatch(signOutUserSuccess(data))
+    } catch (error) {
+      dispatch(signOutUserFailed(data))
     }
   }
   return (
@@ -112,7 +128,7 @@ const Profile = () => {
       </form>
       <div className="flex justify-between p-3 text-red-600 font-semibold">
         <h1 className='hover:underline cursor-pointer' onClick={handleDelete}>Delete Account</h1>
-        <h1 className='hover:underline cursor-pointer'>Sign out</h1>
+        <h1 className='hover:underline cursor-pointer' onClick={handleSignOut}>Sign out</h1>
       </div>
     </div>
   )
