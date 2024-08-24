@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
+import { useSelector } from 'react-redux';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css/bundle';
 import {
@@ -13,6 +14,7 @@ import {
   FaParking,
   FaShare,
 } from 'react-icons/fa';
+import Contact from '../componants/Contact';
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -20,7 +22,10 @@ export default function Listing() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [contact, setContact] = useState(false);
   const params = useParams();
+  const {CurrentUser}  = useSelector((state) => state.user);
+
   useEffect(() => {
     const fetchListing = async () => {
       try {
@@ -42,8 +47,6 @@ export default function Listing() {
     };
     fetchListing();
   }, [params.listingId]);
-  console.log(loading);
-
   return (
     <main>
       {loading && <p className='text-center my-7 text-2xl'>Loading...</p>}
@@ -59,7 +62,7 @@ export default function Listing() {
                   className='h-[550px]'
                   style={{
                     background: `url(${url}) center no-repeat`,
-                    backgroundSize: 'cover',
+                    backgroundSize: 'contain',
                   }}
                 ></div>
               </SwiperSlide>
@@ -100,7 +103,7 @@ export default function Listing() {
               </p>
               {listing.offer && (
                 <p className='bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
-                  ${+listing.regularPrice - +listing.discountPrice}
+                  ${+listing.regularPrice - +listing.discountPrice} OFF
                 </p>
               )}
             </div>
@@ -130,6 +133,16 @@ export default function Listing() {
                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
               </li>
             </ul>
+            {CurrentUser && listing.userRef !== CurrentUser._id && !contact && (
+              
+              <button
+                onClick={() => setContact(true)}
+                className='bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3'
+              >
+                Contact landlord
+              </button>
+            )}
+            {contact && <Contact listing={listing} />}
           </div>
         </div>
       )}
