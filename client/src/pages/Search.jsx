@@ -53,7 +53,7 @@ const [sideBarData,setSideBarData] = useState({
       const res = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await res.json();
       console.log(data)
-      if (data.length > 8) {
+      if (data.length > 1) {
         setShowMore(true);
       } else {
         setShowMore(false);
@@ -98,6 +98,20 @@ const [sideBarData,setSideBarData] = useState({
     urlParams.set('order',sideBarData.order)
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`)
+  }
+
+  const onShowMoreClick = async() => {
+    const numberOfListings = listings.length;
+    const startIndex = numberOfListings;
+    const urlParms = new URLSearchParams(location.search);
+    urlParms.set('setIndex',startIndex);
+    const searchQuery = urlParms.toString();
+    const res = await fetch(`/api/listing/get?${searchQuery}`);
+    const data = await res.json();
+    if(data.length < 1){
+      setShowMore(false);
+    }
+    setListings([...listings,...data])
   }
   return (
     <div className="flex flex-col md:flex-row">
@@ -177,7 +191,10 @@ const [sideBarData,setSideBarData] = useState({
           )}
           {!loading && listings && listings.map((listing)=>(
             <ListingItem key={listing._id} listing={listing}/>
-          ))} 
+          ))}
+          {showMore && (
+            <button onClick={onShowMoreClick} className="text-sm font-semibold underline text-green-500">Show More</button>
+          )}
         </div>
       </div>
     </div>
