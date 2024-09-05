@@ -13,6 +13,7 @@ const [sideBarData,setSideBarData] = useState({
     sort: 'created_at',
     order: 'desc'
   })
+  console.log('==================',sideBarData)
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
   const [showMore, setShowMore] = useState(false);
@@ -53,7 +54,7 @@ const [sideBarData,setSideBarData] = useState({
       const res = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await res.json();
       console.log(data)
-      if (data.length > 1) {
+      if (data.length > 2) {
         setShowMore(true);
       } else {
         setShowMore(false);
@@ -65,26 +66,25 @@ const [sideBarData,setSideBarData] = useState({
     fetchListings();
   },[location.search])
 
-
   const handleChange = (e) => {
-    if(e.target.id === 'all' || e.target.id === 'rent' || e.target.id === 'sale'){
-      setSideBarData({...sideBarData,type: e.target.id})
+    if (e.target.id === 'all' ||e.target.id === 'rent' ||e.target.id === 'sale') {
+      setSideBarData({ ...sideBarData, type: e.target.id });
     }
 
-    if(e.target.id === 'searchTerm'){
-      setSideBarData({...sideBarData,searchTerm: e.target.value})
+    if (e.target.id === 'searchTerm') {
+      setSideBarData({ ...sideBarData, searchTerm: e.target.value });
     }
 
-    if(e.target.id === 'parking' || e.target.id === 'furnished' || e.target.id === 'offer'){
-      setSideBarData({...sideBarData,[e.target.id]: e.target.checked || e.target.checked === 'true' ? true : false});
+    if (e.target.id === 'parking' ||e.target.id === 'furnished' ||e.target.id === 'offer') {
+      setSideBarData({...sideBarData,[e.target.id]: e.target.checked || e.target.checked === 'true' ? true : false });
     }
 
-    if(e.target.id === 'sort_order'){
+    if (e.target.id === 'sort_order'){
       const sort = e.target.value.split('_')[0] || 'created_at';
       const order = e.target.value.split('_')[1] || 'desc';
-      setSideBarData({...setSideBarData,sort,order});
+      setSideBarData({...sideBarData,sort,order});
     }
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -108,7 +108,7 @@ const [sideBarData,setSideBarData] = useState({
     const searchQuery = urlParms.toString();
     const res = await fetch(`/api/listing/get?${searchQuery}`);
     const data = await res.json();
-    if(data.length < 1){
+    if(data.length < 2){
       setShowMore(false);
     }
     setListings([...listings,...data])
@@ -137,13 +137,13 @@ const [sideBarData,setSideBarData] = useState({
             <div className="flex gap-2">
                 <input type="checkbox" id="rent" className="w-5"
                 onChange={handleChange}
-                value={sideBarData.type === 'rent'}/>
+                checked={sideBarData.type === 'rent'}/>
                 <span>Rent</span>
             </div>
             <div className="flex gap-2">
                 <input type="checkbox" id="sale" className="w-5"
                 onChange={handleChange}
-                value={sideBarData.type === 'sale'}/>
+                checked={sideBarData.type === 'sale'}/>
                 <span>sale</span>
             </div>
             <div className="flex gap-2">
@@ -170,7 +170,7 @@ const [sideBarData,setSideBarData] = useState({
           </div>
           <div className="flex items-center gap-3">
             <label>Sort:</label>
-            <select onChange={handleChange} defaultValue={'createdPrice_desc'} id="sort_order" className="p-3 rounded-lg border">
+            <select onChange={handleChange} defaultValue={'created_at_desc'} id="sort_order" className="p-3 rounded-lg border">
                 <option value={'regularPrice_desc'}>Price high to low</option>
                 <option value={'regularPrice_asc'}>Price low to high</option>
                 <option value={'createdAt_desc'}>Latest</option>
